@@ -106,4 +106,4 @@ if __name__ == "__main__":
 # New queries:
 # Find the factorial of 5 then provide log of that value. Solve this my calling reuqired tools in one go.
 # How much Anmol singh paid for his DLF apartment via Capbridge? Search local documents and provide log value of that amount.
-# 
+# Fetch and summarize this url: https://poonamsharmawriter.medium.com/you-should-post-short-articles-on-medium-heres-why-69df4ad4f13b
