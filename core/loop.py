@@ -89,12 +89,19 @@ class AgentLoop:
                         elif result.startswith("FURTHER_PROCESSING_REQUIRED:"):
                             content = result.split("FURTHER_PROCESSING_REQUIRED:")[1].strip()
                             self.context.user_input_override  = (
-                                f"Original user task: {self.context.user_input}\n\n"
-                                f"Your last tool produced this result:\n\n"
-                                f"{content}\n\n"
-                                f"If this fully answers the task, return:\n"
-                                f"FINAL_ANSWER: your answer\n\n"
-                                f"Otherwise, return the next FUNCTION_CALL."
+                                f"Original user request:\n{self.context.user_input}\n\n"
+                                f"Last tool call:\n"
+                                f"============== TOOL CALL ==============\n"
+                                f"{plan}\n"
+                                f"============== END TOOL CALL ==============\n\n"
+                                f"Tool output:\n"
+                                f"============== TOOL OUTPUT ==============\n"
+                                f"{content}\n"
+                                f"============== END TOOL OUTPUT ==============\n\n"
+                                f"If the output contains the necessary information to address the original request, infer the answer and respond as:\n"
+                                f"FINAL_ANSWER: <YOUR_FORMATTED_ANSWER>\n\n"
+                                f"Otherwise, return the next FUNCTION_CALL.\n"
+                                f"Do not repeat the previous tool call with similar parameters. Always check the tool call to be **SURE**"
                             )
                             log("loop", f"📨 Forwarding intermediate result to next step:\n{self.context.user_input_override}\n\n")
                             log("loop", f"🔁 Continuing based on FURTHER_PROCESSING_REQUIRED — Step {step+1} continues...")

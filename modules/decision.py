@@ -37,8 +37,13 @@ async def generate_plan(
 
     prompt = prompt_template.format(
         tool_descriptions=tool_descriptions,
-        user_input=user_input
+        user_input=user_input,
+        step_num=step_num,
+        max_steps=max_steps,
+        memory_texts=memory_texts,
+        perception=perception
     )
+    import pdb;pdb.set_trace()
 
 
     try:
