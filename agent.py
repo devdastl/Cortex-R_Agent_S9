@@ -9,7 +9,7 @@ import datetime
 from pathlib import Path
 import json
 import re
-
+from modules.memory import load_conversation_history, search_historical_conversations, add_conversation_to_history
 def log(stage: str, msg: str):
     """Simple timestamped console logger."""
     now = datetime.datetime.now().strftime("%H:%M:%S")
@@ -35,6 +35,23 @@ async def main():
             if user_input.lower() == 'new':
                 current_session = None
                 continue
+            # Use normalized query for history search (but keep original for agent)
+            normalized_input = user_input.lower()
+
+            # Check history for similar queries
+            history = load_conversation_history()
+            match = search_historical_conversations(normalized_input, history)
+            if match:
+                answer = match.get("answer", "")
+                final_answer = match.get("final_answer", answer.split("FINAL_ANSWER:")[1].strip() if "FINAL_ANSWER:" in answer else answer)
+                
+                print(f"\n🔍 Found answer in history.")
+                cont = input("Do you want to see this answer? (y/n) → ")
+                if cont.lower() == 'y':
+                    print(f"\n💡 Previous Answer: {final_answer}")
+                    continue
+                else:
+                    print("Running agent to get a fresh answer...")
 
             while True:
                 context = AgentContext(
@@ -53,6 +70,8 @@ async def main():
                     answer = result["result"]
                     if "FINAL_ANSWER:" in answer:
                         print(f"\n💡 Final Answer: {answer.split('FINAL_ANSWER:')[1].strip()}")
+                        # Add this conversation to history
+                        add_conversation_to_history(user_input, answer, history)
                         break
                     elif "FURTHER_PROCESSING_REQUIRED:" in answer:
                         user_input = answer.split("FURTHER_PROCESSING_REQUIRED:")[1].strip()
@@ -60,9 +79,13 @@ async def main():
                         continue  # 🧠 Re-run agent with updated input
                     else:
                         print(f"\n💡 Final Answer (raw): {answer}")
+                        # Add this conversation to history
+                        add_conversation_to_history(user_input, answer, history)
                         break
                 else:
                     print(f"\n💡 Final Answer (unexpected): {result}")
+                    # Add this conversation to history
+                    add_conversation_to_history(user_input, answer, history)
                     break
     except KeyboardInterrupt:
         print("\n👋 Received exit signal. Shutting down...")

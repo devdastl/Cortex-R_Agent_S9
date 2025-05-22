@@ -48,10 +48,10 @@ mcp_servers:
     description: "Webtools to search internet for queries and fetch content for a specific web page"
     capabilities: ["duckduckgo_search_results", "download_raw_html_from_url"]
     basic_tools: [duckduckgo_search_results]
-  # - id: memory
-  #   script: modules/mcp_server_memory.py
-  #   cwd: /home/nvidia/devesh/EAG-v1/session_9/shared
-  #   description: "Tools to get Agent-User Conversation History (current session or all historical)"
-  #   capabilities: ["get_current_conversations", "search_historical_conversations"]
-  #   basic_tools: [get_current_conversations, search_historical_conversations]
+  - id: memory
+    script: modules/mcp_server_memory.py
+    cwd: /home/nvidia/devesh/EAG-v1/session_9/shared
+    description: "Tools to get Agent-User Conversation History (current session or all historical)"
+    capabilities: ["get_current_conversations", "search_historical_conversations"]
+    basic_tools: [get_current_conversations, search_historical_conversations]
 

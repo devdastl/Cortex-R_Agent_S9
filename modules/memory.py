@@ -5,6 +5,9 @@ import os
 import time
 from typing import List, Optional
 from pydantic import BaseModel
+from typing import List, Dict, Optional, Any
+
+HISTORY_FILE = "historical_conversation_store.json"
 
 # Optional fallback logger
 try:
@@ -28,6 +31,60 @@ class MemoryItem(BaseModel):
     success: Optional[bool] = None
     metadata: Optional[dict] = {}  # ✅ ADD THIS LINE BACK
 
+def load_conversation_history() -> List[Dict[str, Any]]:
+    """Load the conversation history from the JSON file."""
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            log("history", f"⚠️ Error loading conversation history: {e}")
+            return []
+    else:
+        log("history", f"Creating new conversation history file: {HISTORY_FILE}")
+        return []
+
+def save_conversation_history(history: List[Dict[str, Any]]) -> None:
+    """Save the conversation history to the JSON file."""
+    try:
+        with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+            json.dump(history, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        log("history", f"⚠️ Error saving conversation history: {e}")
+
+def search_historical_conversations(query: str, history: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """
+    Search for similar queries in conversation history.
+    Returns the matched conversation or None if no match is found.
+    Exact match for now, but could be enhanced with semantic search later.
+    """
+    normalized_query = query.lower().strip()
+    
+    # First pass: exact match
+    for conversation in history:
+        if conversation.get("query", "").lower().strip() == normalized_query:
+            log("history", f"Found exact match in history")
+            return conversation
+    
+    # Second pass: simple contains match (could be improved with better similarity)
+    for conversation in history:
+        if normalized_query in conversation.get("query", "").lower() or conversation.get("query", "").lower() in normalized_query:
+            log("history", f"Found similar match in history")
+            return conversation
+    
+    return None
+
+def add_conversation_to_history(query: str, answer: str, history: List[Dict[str, Any]]) -> None:
+    """Add a new conversation to the history."""
+    conversation = {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "query": query,
+        "answer": answer,
+        "final_answer": answer.split("FINAL_ANSWER:")[1].strip() if "FINAL_ANSWER:" in answer else answer
+    }
+    history.append(conversation)
+    save_conversation_history(history)
+    log("history", f"Added conversation to history: {query}")
 
 class MemoryManager:
     """Manages session memory (read/write/append)."""
