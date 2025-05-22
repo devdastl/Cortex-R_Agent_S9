@@ -88,6 +88,9 @@ class AgentLoop:
                             return {"status": "done", "result": self.context.final_answer}
                         elif result.startswith("FURTHER_PROCESSING_REQUIRED:"):
                             content = result.split("FURTHER_PROCESSING_REQUIRED:")[1].strip()
+                            # Remove markdown from content if present
+                            if "markdown" in content:
+                                content = content.split("markdown")[1].strip()
                             self.context.user_input_override  = (
                                 f"Original user request:\n{self.context.user_input}\n\n"
                                 f"Last tool call:\n"
