@@ -56,7 +56,6 @@ async def extract_perception(user_input: str, mcp_server_descriptions: dict) -> 
         servers_text=servers_text,
         user_input=user_input
     )
-    import pdb; pdb.set_trace()
     
 
     try:

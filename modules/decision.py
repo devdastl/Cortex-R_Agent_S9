@@ -51,7 +51,6 @@ async def generate_plan(
         memory_texts=memory_texts,
         perception=perception
     )
-    import pdb;pdb.set_trace()
 
 
     try:
