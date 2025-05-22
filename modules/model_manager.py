@@ -5,6 +5,7 @@ import requests
 from pathlib import Path
 from google import genai
 from dotenv import load_dotenv
+from heuristics import run_llm_output_checks, run_llm_input_checks
 
 load_dotenv()
 
@@ -27,6 +28,13 @@ class ModelManager:
             self.client = genai.Client(api_key=api_key)
 
     async def generate_text(self, prompt: str) -> str:
+        # Validate user input using heuristics
+        is_valid, error_messages, validated_input = run_llm_input_checks(prompt)
+        if not is_valid:
+            log("plan", f"Input validation issues: {error_messages}")
+            # Continue with the validated/sanitized input
+            prompt = validated_input
+
         if self.model_type == "gemini":
             return self._gemini_generate(prompt)
 

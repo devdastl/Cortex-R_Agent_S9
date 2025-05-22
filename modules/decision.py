@@ -3,6 +3,7 @@ from modules.perception import PerceptionResult
 from modules.memory import MemoryItem
 from modules.model_manager import ModelManager
 from modules.tools import load_prompt
+from heuristics import run_llm_input_checks
 import re
 
 # Optional logging fallback
@@ -30,6 +31,13 @@ async def generate_plan(
 ) -> str:
 
     """Generates the full solve() function plan for the agent."""
+
+    # Validate user input using heuristics
+    is_valid, error_messages, validated_input = run_llm_input_checks(user_input)
+    if not is_valid:
+        log("plan", f"Input validation issues: {error_messages}")
+        # Continue with the validated/sanitized input
+        user_input = validated_input
 
     memory_texts = "\n".join(f"- {m.text}" for m in memory_items) or "None"
 
