@@ -70,8 +70,8 @@ Cortex-R is an advanced AI agent system that processes user queries through a pe
 6. **Input/Output Heuristics** (`core/heuristics.py`): Sanitizes inputs and improves outputs
 
 ## Getting started with the repo
-- Clone the repository: `git clone repo name`
-- Sync UV packages: `cd repo_name && uv sync`
+- Clone the repository: `git clone https://github.com/devdastl/Cortex-R_Agent_S9.git`
+- Sync UV packages: `cd repo && uv sync`
 - Run application: `uv run agent.py`
 
 ## Query logs
